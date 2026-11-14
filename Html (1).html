@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบสรุปวันลาและมาปฏิบัติงาน ประจำปี</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-100 font-sans pb-12">
+    <div class="max-w-7xl mx-auto p-4 md:p-6">
+        <!-- Header -->
+        <header class="bg-white p-6 rounded-2xl shadow-sm mb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border border-slate-200">
+            <div>
+                <span class="text-xs font-bold text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full uppercase tracking-wider">กองยุทธศาสตร์และแผนงาน</span>
+                <h1 class="text-2xl font-bold text-slate-800 mt-2">📊 สรุปข้อมูลการมาปฏิบัติงานและวันลา</h1>
+                <p class="text-sm text-slate-500">ระบบจัดการออนไลน์ แก้ไขและอัปเดตได้ทุกที่ทุกเวลาผ่าน GitHub</p>
+            </div>
+            <button onclick="openModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-5 py-2.5 rounded-xl shadow transition flex items-center gap-2">
+                ➕ เพิ่มข้อมูลพนักงาน
+            </button>
+        </header>
+
+        <!-- ตารางข้อมูลหลัก -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse text-sm">
+                    <thead>
+                        <tr class="bg-slate-800 text-white text-xs uppercase tracking-wider text-center">
+                            <th class="p-3 border-r border-slate-700" rowspan="2">ลำดับ</th>
+                            <th class="p-3 border-r border-slate-700 text-left" rowspan="2">รายชื่อ - นามสกุล</th>
+                            <th class="p-3 border-r border-slate-700" rowspan="2">ประเภท</th>
+                            <th class="p-3 border-r border-slate-700" colspan="2">ลาพักผ่อน</th>
+                            <th class="p-3 border-r border-slate-700" colspan="2">ลาป่วย</th>
+                            <th class="p-3 border-r border-slate-700" colspan="2">ลากิจ</th>
+                            <th class="p-3 border-r border-slate-700" colspan="2">มาสาย</th>
+                            <th class="p-3" rowspan="2">จัดการ</th>
+                        </tr>
+                        <tr class="bg-slate-700 text-white text-xs uppercase tracking-wider text-center">
+                            <th class="p-2 border-r border-slate-600">ครั้ง</th>
+                            <th class="p-2 border-r border-slate-600">วัน</th>
+                            <th class="p-2 border-r border-slate-600">ครั้ง</th>
+                            <th class="p-2 border-r border-slate-600">วัน</th>
+                            <th class="p-2 border-r border-slate-600">ครั้ง</th>
+                            <th class="p-2 border-r border-slate-600">วัน</th>
+                            <th class="p-2 border-r border-slate-600">ครั้ง</th>
+                            <th class="p-2 border-r border-slate-600">วัน</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leaveTableBody" class="divide-y divide-slate-200 text-slate-700 text-center">
+                        <!-- ข้อมูลจะถูกโหลดอัตโนมัติด้วย JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal เพิ่ม/แก้ไขข้อมูล -->
+    <div id="leaveModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden justify-center items-center p-4 z-50">
+        <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-xl border border-slate-100">
+            <h3 id="modalTitle" class="text-lg font-bold text-slate-800 mb-4">เพิ่มข้อมูลพนักงานใหม่</h3>
+            <form id="leaveForm" class="space-y-4 text-left">
+                <input type="hidden" id="editIndex" value="">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">ชื่อ - นามสกุล</label>
+                    <input type="text" id="name" required class="w-full border border-slate-300 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">ประเภทบุคลากร</label>
+                    <select id="positionType" class="w-full border border-slate-300 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                        <option value="ข้าราชการ">ข้าราชการ</option>
+                        <option value="พนักงานราชการ">พนักงานราชการ</option>
+                    </select>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">ลาพักผ่อน (ครั้ง)</label>
+                        <input type="number" id="vacationTimes" value="0" min="0" class="w-full border border-slate-300 rounded-xl p-2.5 text-sm outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">ลาพักผ่อน (วัน)</label>
+                        <input type="number" step="0.5" id="vacationDays" value="0" min="0" class="w-full border border-slate-300 rounded-xl p-2.5 text-sm outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">ลาป่วย (ครั้ง)</label>
+                        <input type="number" id="sickTimes" value="0" min="0" class="w-full border border-slate-300 rounded-xl p-2.5 text-sm outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">ลาป่วย (วัน)</label>
+                        <input type="number" step="0.5" id="sickDays" value="0" min="0" class="w-full border border-slate-300 rounded-xl p-2.5 text-sm outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">ลากิจ (ครั้ง)</label>
+                        <input type="number" id="businessTimes" value="0" min="0" class="w-full border border-slate-300 rounded-xl p-2.5 text-sm outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">ลากิจ (วัน)</label>
+                        <input type="number" step="0.5" id="businessDays" value="0" min="0" class="w-full border border-slate-300 rounded-xl p-2.5 text-sm outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">มาสาย (ครั้ง)</label>
+                        <input type="number" id="lateTimes" value="0" min="0" class="w-full border border-slate-300 rounded-xl p-2.5 text-sm outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">มาสาย (นาที/ชั่วโมง)</label>
+                        <input type="number" step="0.5" id="lateDays" value="0" min="0" class="w-full border border-slate-300 rounded-xl p-2.5 text-sm outline-none">
+                    </div>
+                </div>
+                <div class="flex justify-end gap-2 pt-4">
+                    <button type="button" onclick="closeModal()" class="bg-slate-100 text-slate-600 px-4 py-2 rounded-xl text-sm font-semibold hover:bg-slate-200">ยกเลิก</button>
+                    <button type="submit" class="bg-indigo-600 text-white px-5 py-2 rounded-xl text-sm font-semibold hover:bg-indigo-700">บันทึกข้อมูล</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // ข้อมูลตัวอย่างตั้งต้น (อิงจากไฟล์ที่คุณใช้งาน)
+        const defaultData = [
+            { name: "นายธเนศ วิริยะจิตต์", type: "ข้าราชการ", vacT: 2, vacD: 0, sickT: 4, sickD: 1, busT: 0, busD: 0, lateT: 0, lateD: 0 },
+            { name: "นายทีฆายุ ศรีโต", type: "ข้าราชการ", vacT: 2, vacD: 0, sickT: 4, sickD: 1, busT: 0, busD: 0, lateT: 0, lateD: 0 },
+            { name: "นายธรัณ โอศิริ", type: "ข้าราชการ", vacT: 1, vacD: 0, sickT: 12, sickD: 7, busT: 0, busD: 0, lateT: 1, lateD: 18 }
+        ];
+
+        function getData() {
+            const data = localStorage.getItem('leave_summary_67');
+            return data ? JSON.parse(data) : defaultData;
+        }
+
+        function saveData(data) {
+            localStorage.setItem('leave_summary_67', JSON.stringify(data));
+        }
+
+        function renderTable() {
+            const data = getData();
+            const tbody = document.getElementById('leaveTableBody');
+            tbody.innerHTML = '';
+
+            if (data.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="12" class="p-6 text-slate-400">ยังไม่มีข้อมูลในระบบ</td></tr>`;
+                return;
+            }
+
+            data.forEach((item, index) => {
+                const row = document.createElement('tr');
+                row.className = "hover:bg-slate-50 transition";
+                row.innerHTML = `
+                    <td class="p-3 border-b border-slate-200 font-medium">${index + 1}</td>
+                    <td class="p-3 border-b border-slate-200 text-left font-semibold text-slate-800">${item.name}</td>
+                    <td class="p-3 border-b border-slate-200"><span class="bg-slate-100 text-slate-600 px-2 py-0.5 rounded text-xs">${item.type}</span></td>
+                    <td class="p-3 border-b border-slate-200">${item.vacT}</td>
+                    <td class="p-3 border-b border-slate-200 font-medium">${item.vacD}</td>
+                    <td class="p-3 border-b border-slate-200">${item.sickT}</td>
+                    <td class="p-3 border-b border-slate-200 font-medium">${item.sickD}</td>
+                    <td class="p-3 border-b border-slate-200">${item.busT}</td>
+                    <td class="p-3 border-b border-slate-200 font-medium">${item.busD}</td>
+                    <td class="p-3 border-b border-slate-200">${item.lateT}</td>
+                    <td class="p-3 border-b border-slate-200 font-medium">${item.lateD}</td>
+                    <td class="p-3 border-b border-slate-200 whitespace-nowrap">
+                        <button onclick="editItem(${index})" class="text-indigo-600 hover:text-indigo-900 text-xs font-semibold mr-2">แก้ไข</button>
+                        <button onclick="deleteItem(${index})" class="text-rose-500 hover:text-rose-700 text-xs font-semibold">ลบ</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function openModal() {
+            document.getElementById('modalTitle').innerText = "เพิ่มข้อมูลพนักงานใหม่";
+            document.getElementById('leaveForm').reset();
+            document.getElementById('editIndex').value = "";
+            document.getElementById('leaveModal').classList.remove('hidden');
+            document.getElementById('leaveModal').classList.add('flex');
+        }
+
+        function closeModal() {
+            document.getElementById('leaveModal').classList.remove('flex');
+            document.getElementById('leaveModal').classList.add('hidden');
+        }
+
+        document.getElementById('leaveForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const index = document.getElementById('editIndex').value;
+            const newItem = {
+                name: document.getElementById('name').value,
+                type: document.getElementById('positionType').value,
+                vacT: Number(document.getElementById('vacationTimes').value),
+                vacD: Number(document.getElementById('vacationDays').value),
+                sickT: Number(document.getElementById('sickTimes').value),
+                sickD: Number(document.getElementById('sickDays').value),
+                busT: Number(document.getElementById('businessTimes').value),
+                busD: Number(document.getElementById('businessDays').value),
+                lateT: Number(document.getElementById('lateTimes').value),
+                lateD: Number(document.getElementById('lateDays').value)
+            };
+
+            let data = getData();
+            if (index === "") {
+                data.push(newItem);
+            } else {
+                data[index] = newItem;
+            }
+            saveData(data);
+            closeModal();
+            renderTable();
+        });
+
+        function editItem(index) {
+            const data = getData();
+            const item = data[index];
+            document.getElementById('modalTitle').innerText = "แก้ไขข้อมูลวันลา";
+            document.getElementById('editIndex').value = index;
+            document.getElementById('name').value = item.name;
+            document.getElementById('positionType').value = item.type;
+            document.getElementById('vacationTimes').value = item.vacT;
+            document.getElementById('vacationDays').value = item.vacD;
+            document.getElementById('sickTimes').value = item.sickT;
+            document.getElementById('sickDays').value = item.sickD;
+            document.getElementById('businessTimes').value = item.busT;
+            document.getElementById('businessDays').value = item.busD;
+            document.getElementById('lateTimes').value = item.lateT;
+            document.getElementById('lateDays').value = item.lateD;
+
+            document.getElementById('leaveModal').classList.remove('hidden');
+            document.getElementById('leaveModal').classList.add('flex');
+        }
+
+        function deleteItem(index) {
+            if (confirm('คุณต้องการลบรายการนี้ใช่หรือไม่?')) {
+                let data = getData();
+                data.splice(index, 1);
+                saveData(data);
+                renderTable();
+            }
+        }
+
+        window.onload = renderTable;
+    </script>
+</body>
+</html>
