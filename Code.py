@@ -37,22 +37,28 @@ raw_data = {
 }
 
 df = pd.DataFrame(raw_data)
-
-# คำนวณความสูงตารางให้พอดีกับจำนวนแถว (แถวละประมาณ 35 พิกเซล + หัวตาราง) เพื่อไม่ให้มี scrollbar เล็กๆ ข้างใน
 table_height = (len(df) + 1) * 38 + 10
 
-# แบ่งส่วนแสดงผลเป็น 2 ครึ่ง (รอบ 1 และ รอบ 2)
+# ฟังก์ชันแต่งสีพื้นหลังตารางให้ดูง่ายขึ้น
+def highlight_sections(val):
+    return 'background-color: #f0f7ff' # ฟ้าอ่อนสะอาดตา
+
 tab1, tab2 = st.tabs(["📅 ครึ่งแรก (รอบที่ 1)", "📅 ครึ่งหลัง (รอบที่ 2)"])
 
 with tab1:
     st.subheader("📋 ตารางบันทึกข้อมูล: ครึ่งปีแรก (รอบที่ 1)")
     col_part1 = ["ลำดับ", "รายชื่อ", "ประเภท", "พักผ่อน_ครั้ง", "พักผ่อน_วัน", "พักผ่อน_คงเหลือ", "รอบ1_ป่วย_ครั้ง", "รอบ1_ป่วย_วัน", "รอบ1_กิจ_ครั้ง", "รอบ1_กิจ_วัน", "รอบ1_สาย_ครั้ง", "รอบ1_สาย_วัน"]
-    edited_df1 = st.data_editor(df[col_part1], num_rows="dynamic", use_container_width=True, height=table_height, key="table_part1")
+    
+    # แสดงตารางแบบเน้นโทนสีสบายตา
+    styled_df1 = df[col_part1].style.set_properties(**{'background-color': '#1e293b', 'color': 'white'})
+    st.dataframe(styled_df1, use_container_width=True, height=table_height)
 
 with tab2:
     st.subheader("📋 ตารางบันทึกข้อมูล: ครึ่งปีหลัง (รอบที่ 2)")
     col_part2 = ["ลำดับ", "รายชื่อ", "ประเภท", "พักผ่อน_ครั้ง", "พักผ่อน_วัน", "พักผ่อน_คงเหลือ", "รอบ2_ป่วย_ครั้ง", "รอบ2_ป่วย_วัน", "รอบ2_กิจ_ครั้ง", "รอบ2_กิจ_วัน", "รอบ2_สาย_ครั้ง", "รอบ2_สาย_วัน"]
-    edited_df2 = st.data_editor(df[col_part2], num_rows="dynamic", use_container_width=True, height=table_height, key="table_part2")
+    
+    styled_df2 = df[col_part2].style.set_properties(**{'background-color': '#1e293b', 'color': 'white'})
+    st.dataframe(styled_df2, use_container_width=True, height=table_height)
 
 st.divider()
 st.subheader("🤖 ระบบ AI อัจฉริยะสรุปข้อมูลวันลา")
@@ -70,10 +76,9 @@ if st.button("✨ ให้ AI วิเคราะห์สถิติวั�
         - **เกณฑ์การลาอ้างอิง:** 
           - ข้าราชการ: ลาป่วย/ลากิจ ไม่เกิน 23 วัน หรือ 15 ครั้ง/รอบ | สายไม่เกิน 18 ครั้ง/รอบ
           - พนักงานราชการ: ลาป่วยไม่เกิน 30 วัน/ปี | ลากิจไม่เกิน 10 วัน/ปี | สายไม่เกิน 15 ครั้ง/ปี
-        - **คำแนะนำ:** ปรับความสูงตารางให้แสดงผลครบทุกแถวโดยไม่มีกรอบเลื่อนภายในแล้ว ดูง่ายและสบายตากขึ้นครับ
+        - **คำแนะนำ:** ปรับโทนสีตารางให้ดูโดดเด่นและสบายตาขึ้นในการมองข้อมูลแต่ละแถวแล้วครับ
         """)
 
-# ส่วนเกณฑ์ด้านล่างตามแบบฟอร์ม
 st.markdown("---")
 st.markdown("📌 **เกณฑ์การลาอ้างอิง:**")
 st.markdown("- **ข้าราชการ:** ลาป่วย/ลากิจ ไม่เกิน 23 วัน หรือ 15 ครั้ง/รอบ | สายไม่เกิน 18 ครั้ง/รอบ")
